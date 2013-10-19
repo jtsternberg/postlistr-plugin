@@ -9,19 +9,15 @@
  */
 ?>
 
-<script id="tmpl-postlistr" type="text/template">
-<div class="row">
-	<div>
-	<% if ( featured_image ) { %>
-		<img src="<%= featured_image %>" alt="Featured Image for <%- title %>"/>
-	<% } %>
-	</div>
-
-	<div>
-		<h4><a href="<%= URL %>"><%= title %></a></h4>
-		<p class="meta">
-			<em>Posted on <%= new Date( date ).toDateString() %> by <%= author.name %></em>
-		</p>
-	</div>
+<% if ( featured_image ) { %>
+<div>
+	<img src="<%= featured_image %>" alt="Featured Image for <%- title %>"/>
 </div>
-</script>
+<% } %>
+
+<div>
+	<h4><a href="<%= URL %>"><%= title %></a></h4>
+	<p class="meta">
+		<em>Posted on <%= new Date( date ).toDateString() %> by <%= author.name %></em>
+	</p>
+</div>

@@ -23,6 +23,6 @@
 		  <p class="description">Example: visualdemo.wordpress.com</p>
 	</div>
 
-	<div id="postlistr-app" class="container-fluid"></div>
+	<ol id="postlistr-app" class="container-fluid"></ol>
 
 </div>

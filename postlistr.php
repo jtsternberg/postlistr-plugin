@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: PostListr Plugin
+Plugin Name: JT PostListr
 Description: Simple backbone plugin example that integrates the PostListr app demo by @kadamwhite.
 Author: Devin Price
 Author URI: http://www.wptheming.com
-Version: 0.1
+Version: 0.1.0
 License: GPLv3+ - http://www.gnu.org/licenses/gpl.html
 
 This plugin is a basic example of how to display JSON data with an underscore template.  Check out @kadamwhite's talk on WordPress.tv for a more complete picture of how this all works.
@@ -17,12 +17,12 @@ GitHub Repo: https://github.com/kadamwhite/wordbone-pressback/tree/master/PostLi
 
 if ( ! class_exists( 'PostListr_Plugin' ) ) :
 
-class Postlistr_Plugin {
+class PostListr_Plugin {
 
 	/**
 	 * Unique identifier
 	 *
-	 * @since 0.1
+	 * @since 0.1.0
 	 * @var string
 	 */
 	protected $slug = 'postlistr';
@@ -30,7 +30,7 @@ class Postlistr_Plugin {
 	/**
 	 * Slug of the plugin screen.
 	 *
-	 * @since 0.1
+	 * @since 0.1.0
 	 * @var string
 	 */
 	protected $hook = null;
@@ -38,15 +38,36 @@ class Postlistr_Plugin {
 	/**
 	 * Plugin version, used for cache-busting of style and script file references.
 	 *
-	 * @since 0.1
+	 * @since 0.1.0
 	 * @var string
 	 */
-	protected $version = '0.1';
+	protected $version = '0.1.0';
+
+	/**
+	 * A single instance of this class.
+	 *
+	 * @since 0.1.0
+	 * @var Postlistr_Plugin
+	 */
+	public static $instance = null;
+
+	/**
+	 * Creates or returns an instance of this class.
+	 *
+	 * @since  0.1.0
+	 * @return Postlistr_Plugin A single instance of this class.
+	 */
+	public static function get() {
+		if ( self::$instance === null )
+			self::$instance = new self();
+
+		return self::$instance;
+	}
 
 	/**
 	 * Initialize the plugin
 	 *
-	 * @since 0.1
+	 * @since 0.1.0
 	 */
 	public function __construct() {
 
@@ -54,38 +75,31 @@ class Postlistr_Plugin {
 		add_action( 'admin_menu', array( $this, 'add_menu_item' ) );
 
 		// Load CSS and JS for admin
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
 
 		// Include the underscore template
-		add_action( 'admin_footer-' . 'toplevel_page_postlistr' , array( $this, 'postlistr_js_template' ) );
+		add_action( 'admin_footer-toplevel_page_postlistr' , array( $this, 'js_template' ) );
 
 	}
 
 	/**
 	 * Register the administration menu for this plugin into the WordPress Dashboard menu.
 	 *
-	 * link: http://codex.wordpress.org/Function_Reference/add_menu_page
-	 * @since 0.1
+	 * @link  http://codex.wordpress.org/Function_Reference/add_menu_page
+	 * @since 0.1.0
 	 */
 	public function add_menu_item() {
 
-		$this->hook = add_menu_page(
-			__( 'PostListr', $this->slug ),			// page_title
-			__( 'PostListr', $this->slug ),			// menu_title
-			'activate_plugins',						// capability
-			'postlistr',							// menu_slug
-			array( $this, 'display_page' ),			// function
-			'',										// icon_url
-			70										// position
-		);
+		$title = __( 'PostListr', 'postlistr' );
+		$this->hook = add_menu_page( $title, $title, 'activate_plugins', $this->slug, array( $this, 'display_page' ), '', 70 );
 
 	}
 
 	/**
 	 * Render the page for this plugin
 	 *
-	 * @since 0.1
+	 * @since 0.1.0
 	 */
 	public function display_page() {
 		include_once( 'postlistr-page.php' );
@@ -94,9 +108,9 @@ class Postlistr_Plugin {
 	/**
 	 * Register and enqueue admin-specific style sheet.
 	 *
-	 * @since  0.1
+	 * @since  0.1.0
 	 */
-	public function enqueue_admin_styles() {
+	public function admin_styles() {
 
 		$screen = get_current_screen();
 
@@ -111,10 +125,10 @@ class Postlistr_Plugin {
 	/**
 	 * Register and enqueue admin-specific JavaScript.
 	 *
-	 * @since 0.1
+	 * @since 0.1.0
 	 * @return null Return early if we're not on the right page
 	 */
-	public function enqueue_admin_scripts() {
+	public function admin_scripts() {
 
 		$screen = get_current_screen();
 
@@ -130,13 +144,17 @@ class Postlistr_Plugin {
 	/**
 	 * Prints the underscore template in wp_footer
 	 *
-	 * @since 0.1
+	 * @since 0.1.0
 	 */
-	public function postlistr_js_template() {
-		include_once( 'postlistr-tmpl.php' );
+	public function js_template() {
+		?>
+		<script id="tmpl-postlistr" type="text/template">
+		<?php include_once 'postlistr-tmpl.php'; ?>
+		</script>
+		<?php
 	}
 }
 
-new PostListr_Plugin;
+PostListr_Plugin::get();
 
 endif;

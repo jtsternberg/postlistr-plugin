@@ -5,18 +5,17 @@ window.wp = window.wp || {};
 
 	postlistr = wp.postlistr = { model: {}, view: {}, controller: {} };
 
-	postlistr.model.Post = Backbone.Model.extend({});
-
 	postlistr.model.Posts = Backbone.Collection.extend({
-		model: postlistr.model.Post,
+		model: Backbone.Model.extend({}),
 		parse: function(response) {
 			return response.posts;
 		}
 	});
 
 	postlistr.view.PostView = Backbone.View.extend({
-		template: wp.template('postlistr'),
 		render: function() {
+			this.setElement( $('<li/>').attr( 'class', 'row' ) );
+			// Process the template
 			this.$el.html( _.template( $('#tmpl-postlistr').html(), this.model.attributes) );
 			return this;
 		}
@@ -82,7 +81,7 @@ window.wp = window.wp || {};
 	});
 
 	var posts = new postlistr.model.Posts([], {
-		url: 'http://public-api.wordpress.com/rest/v1/sites/publisherdemo.wordpress.com/posts/?number=10&callback=?'
+		url: 'http://public-api.wordpress.com/rest/v1/sites/dsgnwrks.pro/posts/?number=10&callback=?'
 	});
 
 	var postList = new postlistr.view.PostList({

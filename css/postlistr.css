@@ -19,3 +19,7 @@
 	padding-bottom:25px;
 	margin-bottom:25px;
 }
+#postlistr-app .row:last-child {
+	border-bottom:0;
+	margin-bottom:0;
+}
