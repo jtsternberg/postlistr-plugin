@@ -4,6 +4,8 @@ window.wp = window.wp || {};
 	var postlistr;
 
 	postlistr = wp.postlistr = { model: {}, view: {}, controller: {} };
+	postlistr.formclass = '.listr-header';
+	postlistr.initalurl = 'dsgnwrks.pro';
 
 	postlistr.model.Posts = Backbone.Collection.extend({
 		model: Backbone.Model.extend({}),
@@ -24,6 +26,7 @@ window.wp = window.wp || {};
 	postlistr.view.PostList = Backbone.View.extend({
 		render: function() {
 			var $postList = this.$el;
+			var $input = $( postlistr.formclass +' input' );
 			$postList.empty();
 			this.collection.each(function(model) {
 				var postView = new postlistr.view.PostView({
@@ -31,6 +34,11 @@ window.wp = window.wp || {};
 				});
 				postView.render().$el.appendTo($postList);
 			});
+
+			// fill the input with the default url if the first load
+			if ( ! $input.val() )
+				$input.val(postlistr.initalurl);
+
 			return this;
 		},
 		initialize: function() {
@@ -41,29 +49,25 @@ window.wp = window.wp || {};
 
 	postlistr.view.BlogForm = Backbone.View.extend({
 		events: {
-			'submit form': 'loadPosts'
-		},
-		loadPosts: function(evt) {
-			var blog, newBlogUrl;
-			evt.preventDefault();
-			// Get whatever the user entered
-			blog = this.$el.find('input').val();
-			// Strip slashes
-			blog = blog.replace(/\//g, '');
-			if (!blog) {
-				// Nothing was entered
-				return;
+			'submit form': function(evt) {
+				evt.preventDefault();
+				// Get whatever the user entered (Strip slashes)
+				var blog = this.$el.find('input').val().replace(/\//g, '');
+
+				// If nothing was entered
+				if (!blog)
+					return;
+
+				this.collection.url = ['http://public-api.wordpress.com/rest/v1/sites/', blog, '/posts/?number=10&callback=?'].join('');
+
+				// Hi developer!
+				console.log(this.collection.url);
+
+				this.collection.reset();
+				this.collection.fetch({
+					reset: true
+				});
 			}
-			newBlogUrl = ['http://public-api.wordpress.com/rest/v1/sites/', blog, '/posts/?number=10&callback=?'].join('');
-
-			// Hi developer!
-			console.log(newBlogUrl);
-
-			this.collection.url = newBlogUrl;
-			this.collection.reset();
-			this.collection.fetch({
-				reset: true
-			});
 		}
 	});
 
@@ -81,16 +85,16 @@ window.wp = window.wp || {};
 	});
 
 	var posts = new postlistr.model.Posts([], {
-		url: 'http://public-api.wordpress.com/rest/v1/sites/dsgnwrks.pro/posts/?number=10&callback=?'
+		url: 'http://public-api.wordpress.com/rest/v1/sites/'+ postlistr.initalurl +'/posts/?number=10&callback=?'
 	});
 
 	var postList = new postlistr.view.PostList({
-		collection: posts,
-		el: '#postlistr-app'
+		el: '#postlistr-app',
+		collection: posts
 	});
 
 	var blogForm = new postlistr.view.BlogForm({
-		el: '.listr-header',
+		el: postlistr.formclass,
 		collection: posts
 	});
 
